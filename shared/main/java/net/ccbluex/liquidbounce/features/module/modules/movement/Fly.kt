@@ -284,11 +284,11 @@ class Fly : Module() {
                 }
                 "glidevanilla" -> {
                     thePlayer.capabilities.isFlying = false;
-                    thePlayer.motionY = -0.20
+                    thePlayer.motionY = -0.07
                     thePlayer.motionX = 0.0
                     thePlayer.motionZ = 0.0
                     if (mc.gameSettings.keyBindJump.isKeyDown)
-                        thePlayer.motionY += vanillaSpeed
+                        thePlayer.motionY += 0.8F
                     if (mc.gameSettings.keyBindSneak.isKeyDown)
                         thePlayer.motionY -= vanillaSpeed
                     MovementUtils.strafe(vanillaSpeed)
@@ -651,7 +651,7 @@ class Fly : Module() {
                 }
             }
             "glidevanilla" -> {
-                mc.thePlayer!!.motionY = -0.50
+                mc.thePlayer!!.motionY = -0.1
             }
             "boosthypixel" -> {
                 if (!MovementUtils.isMoving) {

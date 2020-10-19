@@ -6,9 +6,9 @@
 package net.ccbluex.liquidbounce.features.module.modules.combat
 
 import net.ccbluex.liquidbounce.LiquidBounce
+import net.ccbluex.liquidbounce.api.MinecraftVersion
 import net.ccbluex.liquidbounce.api.enums.EnumFacingType
 import net.ccbluex.liquidbounce.api.enums.WEnumHand
-import net.ccbluex.liquidbounce.api.MinecraftVersion
 import net.ccbluex.liquidbounce.api.minecraft.client.entity.IEntity
 import net.ccbluex.liquidbounce.api.minecraft.client.entity.IEntityLivingBase
 import net.ccbluex.liquidbounce.api.minecraft.network.play.client.ICPacketPlayerDigging
@@ -36,6 +36,8 @@ import net.ccbluex.liquidbounce.value.BoolValue
 import net.ccbluex.liquidbounce.value.FloatValue
 import net.ccbluex.liquidbounce.value.IntegerValue
 import net.ccbluex.liquidbounce.value.ListValue
+import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLivingBase
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import java.util.*
@@ -163,8 +165,6 @@ class KillAura : Module() {
     private val attackTimer = MSTimer()
     private var attackDelay = 0L
     private var clicks = 0
-
-    public var noSwingState = false
 
     // Container Delay
     private var containerOpen = -1L
@@ -313,10 +313,6 @@ class KillAura : Module() {
             return
         }
 
-        if(noSwingValue.get()) {
-            noSwingState = true
-        }
-
         if (noInventoryAttackValue.get() && (classProvider.isGuiContainer(mc.currentScreen) ||
                         System.currentTimeMillis() - containerOpen < noInventoryDelayValue.get())) {
             target = null
@@ -394,6 +390,8 @@ class KillAura : Module() {
         // Settings
         val failRate = failRateValue.get()
         val swing = swingValue.get()
+        val noSwing = noSwingValue.get()
+        val serverSideNoSwing = serverSideNoSwingValue.get()
         val multi = targetModeValue.get().equals("Multi", ignoreCase = true)
         val openInventory = aacValue.get() && classProvider.isGuiContainer(mc.currentScreen)
         val failHit = failRate > 0 && Random().nextInt(100) <= failRate
@@ -405,7 +403,7 @@ class KillAura : Module() {
         // Check is not hitable or check failrate
 
         if (!hitable || failHit) {
-            if (swing && (fakeSwingValue.get() || failHit))
+            if (swing && (!noSwing && !serverSideNoSwing) && (fakeSwingValue.get() || failHit))
                 thePlayer.swingItem()
         } else {
             // Attack
@@ -540,12 +538,12 @@ class KillAura : Module() {
         LiquidBounce.eventManager.callEvent(AttackEvent(entity))
 
         // Attack target
-        if (swingValue.get() && Backend.MINECRAFT_VERSION_MINOR == 8)
+        if (swingValue.get() && (!noSwingValue.get() && !serverSideNoSwingValue.get()) && Backend.MINECRAFT_VERSION_MINOR == 8)
             thePlayer.swingItem()
 
         mc.netHandler.addToSendQueue(classProvider.createCPacketUseEntity(entity, ICPacketUseEntity.WAction.ATTACK))
 
-        if (swingValue.get() && Backend.MINECRAFT_VERSION_MINOR != 8)
+        if (swingValue.get() && (!noSwingValue.get() && !serverSideNoSwingValue.get()) && Backend.MINECRAFT_VERSION_MINOR != 8)
             thePlayer.swingItem()
 
         if (keepSprintValue.get()) {

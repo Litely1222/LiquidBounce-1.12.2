@@ -12,6 +12,7 @@ import net.ccbluex.liquidbounce.event.UpdateEvent
 import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.ModuleCategory
 import net.ccbluex.liquidbounce.features.module.ModuleInfo
+import net.ccbluex.liquidbounce.utils.ClientUtils
 import net.ccbluex.liquidbounce.utils.MovementUtils
 import net.ccbluex.liquidbounce.value.BoolValue
 import net.ccbluex.liquidbounce.value.FloatValue
@@ -51,6 +52,9 @@ class FreeCam : Module() {
             thePlayer.noClip = true
 
         fakePlayer = playerMP
+        if (cancelKeepAliveValue.get()) {
+            ClientUtils.displayChatMessage("Warning! You can be in freecam ONLY 30 seconds! After 29 second you will be kicked!")
+        }
     }
 
     override fun onDisable() {

@@ -14,19 +14,20 @@ import net.ccbluex.liquidbounce.features.module.Module
 import net.ccbluex.liquidbounce.features.module.ModuleCategory
 import net.ccbluex.liquidbounce.features.module.ModuleInfo
 import net.ccbluex.liquidbounce.features.module.modules.movement.Fly
+import net.ccbluex.liquidbounce.utils.ClientUtils
 import net.ccbluex.liquidbounce.utils.MovementUtils
 import net.ccbluex.liquidbounce.utils.timer.MSTimer
-import net.ccbluex.liquidbounce.value.BoolValue
 import net.ccbluex.liquidbounce.value.IntegerValue
 import net.ccbluex.liquidbounce.value.ListValue
-import net.minecraft.client.audio.ISound
-import net.minecraft.client.audio.PositionedSoundRecord
+import net.minecraft.network.Packet
 import net.minecraft.network.play.client.CPacketPlayer
+import net.minecraft.network.play.client.CPacketUseEntity
+
 
 @ModuleInfo(name = "Criticals", description = "Automatically deals critical hits.", category = ModuleCategory.COMBAT)
 class Criticals : Module() {
 
-    val modeValue = ListValue("Mode", arrayOf("Packet", "Packet2", "Packet3", "Packet4", "SuperPacket", "NoGround", "NoGround2", "Hop", "TPHop", "FakeJump", "FakeJump2", "Jump", "LowJump", "LowJump2", "Visual"), "Packet")
+    val modeValue = ListValue("Mode", arrayOf("NCPPacket", "NCPPacket2", "Packet3", "Packet4", "OldNCPPacket", "OldNCPPacket2", "NoGround", "NoGround2", "Hop", "TPHop", "FakeJump", "FakeJump2", "Jump", "LowJump", "LowJump2", "Visual"), "Packet")
     val delayValue = IntegerValue("Delay", 0, 0, 500)
     private val hurtTimeValue = IntegerValue("HurtTime", 10, 0, 10)
 
@@ -85,13 +86,13 @@ class Criticals : Module() {
                 "noground2" -> {
                     thePlayer.onCriticalHit(entity)
                 }
-                "packet" -> {
+                "ncppacket" -> {
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(x, y + 0.0625, z, true))
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(x, y, z, false))
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(x, y + 1.1E-5, z, false))
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(x, y, z, false))
                 }
-                "packet2" -> {
+                "ncppacket2" -> {
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(x, y + 0.11, z, false))
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(x, y + 0.1100013579, z, false))
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(x, y + 0.0000013579, z, false))
@@ -105,7 +106,7 @@ class Criticals : Module() {
                 "packet4" -> {
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(thePlayer.posX, thePlayer.posY + 0.0031311231111, thePlayer.posZ, false))
                 }
-                "superpacket" -> {
+                "oldncppacket" -> {
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(thePlayer.posX, thePlayer.posY + 0.1625, thePlayer.posZ, false))
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(thePlayer.posX, thePlayer.posY, thePlayer.posZ, false))
                     mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(thePlayer.posX, thePlayer.posY + 4.0E-6, thePlayer.posZ, false))
@@ -139,6 +140,22 @@ class Criticals : Module() {
             packet.onGround = false
         if(packet is CPacketPlayer && modeValue.get().equals("NoGround2", ignoreCase = true) && !thePlayer.onGround && !thePlayer.isCollidedVertically && thePlayer.fallDistance < 2)
             packet.onGround = true
+
+        when (modeValue.get().toLowerCase()) {
+            "oldncppacket2" -> {
+                if (packet is CPacketUseEntity) {
+                    val packet: CPacketUseEntity = packet as CPacketUseEntity
+                    if (packet.getAction() == CPacketUseEntity.Action.ATTACK) {
+                        mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(mc2.player.posX, mc2.player.posY + 0.05, mc2.player.posZ, false))
+                        mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(mc2.player.posX, mc2.player.posY, mc2.player.posZ, false))
+                        mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(mc2.player.posX, mc2.player.posY, mc2.player.posZ, true))
+                        mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(mc2.player.posX, mc2.player.posY + 0.012511, mc2.player.posZ, false))
+                        mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(mc2.player.posX, mc2.player.posY, mc2.player.posZ, false))
+                        mc.netHandler.addToSendQueue(classProvider.createCPacketPlayerPosition(mc2.player.posX, mc2.player.posY, mc2.player.posZ, true))
+                    }
+                }
+            }
+        }
     }
 
     override val tag: String?

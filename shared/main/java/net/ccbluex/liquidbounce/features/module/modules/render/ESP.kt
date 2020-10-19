@@ -34,7 +34,7 @@ import java.awt.Color
 @ModuleInfo(name = "ESP", description = "Allows you to see targets through walls.", category = ModuleCategory.RENDER)
 class ESP : Module() {
     @JvmField
-    val modeValue = ListValue("Mode", arrayOf("Box", "OtherBox", "WireFrame", "2D", "Real2D", "Outline", "ShaderOutline", "ShaderGlow", "Glow"), "Box")
+    val modeValue = ListValue("Mode", arrayOf("Box", "OtherBox", "WireFrame", "2D", "Real2D", "Outline", "ShaderOutline", "ShaderGlow"), "Box")
 
     @JvmField
     val outlineWidth = FloatValue("Outline-Width", 3f, 0.5f, 5f)
@@ -48,22 +48,6 @@ class ESP : Module() {
     private val colorBlueValue = IntegerValue("B", 255, 0, 255)
     private val colorRainbow = BoolValue("Rainbow", false)
     private val colorTeam = BoolValue("Team", false)
-
-    @EventTarget
-    fun onUpdate(event: UpdateEvent) {
-        val mode = modeValue.get()
-        for (entity in mc.theWorld!!.loadedEntityList) {
-            if (entity != mc.thePlayer && EntityUtils.isSelected(entity, false)) {
-                val entityLiving = entity.asEntityLivingBase()
-
-                when (mode.toLowerCase()) {
-                    "glow" -> {
-                        entityLiving.addPotionEffect(classProvider.createPotionEffect(classProvider.getPotionEnum(PotionType.GLOWING).id, 1337, 1))
-                    }
-                }
-            }
-        }
-    }
 
     @EventTarget
     fun onRender3D(event: Render3DEvent?) {

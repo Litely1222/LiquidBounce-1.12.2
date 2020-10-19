@@ -1,7 +1,5 @@
 package net.ccbluex.liquidbounce.features.module.modules.movement;
 
-import net.ccbluex.liquidbounce.event.EventImpl;
-import net.ccbluex.liquidbounce.event.EventMotionUpdate;
 import net.ccbluex.liquidbounce.event.EventTarget;
 import net.ccbluex.liquidbounce.event.UpdateEvent;
 import net.ccbluex.liquidbounce.features.module.Module;
@@ -13,8 +11,8 @@ public class NoPush extends Module {
 
     public static boolean noPush;
 
-    @EventImpl
-    public void onUpdate(UpdateEvent eventMotionUpdate) {
+    @EventTarget
+    public void onUpdate(final UpdateEvent event) {
         noPush = true;
 
         super.onUpdate();

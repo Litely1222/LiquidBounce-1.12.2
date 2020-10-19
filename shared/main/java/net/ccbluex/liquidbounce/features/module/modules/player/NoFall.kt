@@ -30,7 +30,7 @@ import kotlin.math.sqrt
 @ModuleInfo(name = "NoFall", description = "Prevents you from taking fall damage.", category = ModuleCategory.PLAYER)
 class NoFall : Module() {
     @JvmField
-    val modeValue = ListValue("Mode", arrayOf("SpoofGround", "NoGround", "Packet", "MLG", "AAC", "LAAC", "AAC3.3.11", "AAC3.3.15", "Spartan", "CubeCraft", "Hypixel"), "SpoofGround")
+    val modeValue = ListValue("Mode", arrayOf("SpoofOnGround", "NoGround", "Packet", "MLG", "AAC", "LAAC", "AAC3.3.11", "AAC3.3.15", "Spartan", "CubeCraft", "Hypixel"), "SpoofOnGround")
     private val minFallDistance = FloatValue("MinMLGHeight", 5f, 2f, 50f)
     private val spartanTimer = TickTimer()
     private val mlgTimer = TickTimer()
@@ -121,7 +121,7 @@ class NoFall : Module() {
         val mode = modeValue.get()
         if (classProvider.isCPacketPlayer(packet)) {
             val playerPacket = packet.asCPacketPlayer()
-            if (mode.equals("SpoofGround", ignoreCase = true)) playerPacket.onGround = true
+            if (mode.equals("SpoofOnGround", ignoreCase = true)) playerPacket.onGround = true
             if (mode.equals("NoGround", ignoreCase = true)) playerPacket.onGround = false
             if (mode.equals("Hypixel", ignoreCase = true)
                     && mc.thePlayer != null && mc.thePlayer!!.fallDistance > 1.5) playerPacket.onGround = mc.thePlayer!!.ticksExisted % 2 == 0

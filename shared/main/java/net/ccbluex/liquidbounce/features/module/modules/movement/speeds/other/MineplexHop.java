@@ -54,8 +54,7 @@ public class MineplexHop extends SpeedMode {
     }
 
     @EventTarget
-    public void onMotion(final MotionEvent event) {
-        final EventState eventState = event.getEventState();
+    public void onUpdate(final UpdateEvent event) {
             double speed = 0.15;
             if (mc2.player.collidedHorizontally || !isMoving2()) {
                 mineplex = -2;
